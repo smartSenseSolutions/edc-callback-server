@@ -41,7 +41,8 @@ public class EdcCallbackController {
     @PostMapping(value = "/endpoint-data-reference")
     public void receiveEdcCallback(@RequestBody EndpointDataReference dataReference) throws JsonProcessingException {
         var contractAgreementId = dataReference.getProperties().get("cid");
-        logger.info("EdcCallbackController [receiveEdcCallback] callBackId:{}, contractAgreementId:{}", dataReference.getId(), contractAgreementId);
+        logger.info("EdcCallbackController [receiveEdcCallback] callBackId :: {}\n, contractAgreementId :: {}\n, Endpoint :: {}\n, AuthKey :: {}\n, AuthCode :: {}\n",
+                dataReference.getId(), contractAgreementId, dataReference.getEndpoint(), dataReference.getAuthKey(), dataReference.getAuthCode());
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(connectionTimeout, TimeUnit.SECONDS)
                 .writeTimeout(writeTimeout, TimeUnit.SECONDS)
@@ -69,9 +70,10 @@ public class EdcCallbackController {
     }
 
     @PostMapping(value = "/test")
-    public void test(@RequestBody String data) {
+    public void test(@RequestBody String data) throws InterruptedException {
         logger.info("###################################");
         logger.info("Data {} Has Received..", data);
         logger.info("###################################");
+        Thread.sleep(10000);
     }
 }
