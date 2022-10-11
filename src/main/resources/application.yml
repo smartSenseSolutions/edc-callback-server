@@ -1,0 +1,9 @@
+server:
+  port: ${APPLICATION_PORT:8080}
+  servlet:
+    contextPath: /api
+
+http:
+  connectionTimeout: ${CONNECTION_TIMEOUT:10}
+  writeTimeout: ${WRITE_TIMEOUT:10}
+  readTimeout: ${READ_TIMEOUT:10}
