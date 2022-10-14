@@ -77,7 +77,7 @@ public class EndpointDataReference {
         }
 
         public Builder endpoint(String address) {
-            this.endpoint = address;
+            endpoint = address;
             return this;
         }
 

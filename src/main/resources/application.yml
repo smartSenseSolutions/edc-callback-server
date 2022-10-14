@@ -1,9 +1,39 @@
 server:
   port: ${APPLICATION_PORT:8080}
   servlet:
-    contextPath: /api
+    contextPath: ${CONTEXT_PATH:/api}
 
 http:
-  connectionTimeout: ${CONNECTION_TIMEOUT:15}
-  writeTimeout: ${WRITE_TIMEOUT:15}
-  readTimeout: ${READ_TIMEOUT:15}
+  connectionTimeout: ${CONNECTION_TIMEOUT:15000}
+  writeTimeout: ${WRITE_TIMEOUT:15000}
+  readTimeout: ${READ_TIMEOUT:15000}
+
+spring:
+  application:
+    name: ${APPLICATION_NAME:EDC}
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/trace-BE}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+    initialization-mode: always
+    hikari:
+      minimum-idle: ${JDBC_MINIMUM_IDLE_TIME:10}
+      connectionTimeout: ${JDBC_CONNECTION_TIMEOUT:120000}
+      maximumPoolSize: ${JDBC_MAX_POOL_SIZE:20}
+      leakDetectionThreshold: ${JDBC_LEAK_DETECTION_THRESHOLD:50000}
+      maxLifetime: ${JDBC_MAX_LIFETIME:30000}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+
+organization:
+  edcHost: ${EDC_HOST:http://localhost:9192}
+  catalogEndpoint: ${CATALOG_ENDPOINT:/api/v1/data/catalog?providerUrl=}
+  transferEndpoint: ${TRANSFER_ENDPOINT:/api/v1/data/transferprocess}
+  negotiationEndpoint: ${NEGOTIATION_ENDPOINT:/api/v1/data/contractnegotiations}
+  authkey: ${AUTH_KEY:password}
