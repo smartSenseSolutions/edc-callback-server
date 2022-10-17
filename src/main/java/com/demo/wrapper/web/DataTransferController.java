@@ -3,6 +3,7 @@ package com.demo.wrapper.web;
 import com.demo.wrapper.config.EDCConfiguration;
 import com.demo.wrapper.dao.ReceivedAssetDetails;
 import com.demo.wrapper.dao.SentAssetDetails;
+import com.demo.wrapper.model.CreateDataRequest;
 import com.demo.wrapper.model.DataTransferRequest;
 import com.demo.wrapper.model.TransferData;
 import com.demo.wrapper.model.edc.notification.TransferId;
@@ -90,7 +91,12 @@ public class DataTransferController {
             logger.info("TransferProcess has been completed successfully and transferId --> {} for assetId --> {}", transferId.getId(), request.getAssetId());
 
             String data = objectMapper.writeValueAsString(request);
-            SentAssetDetails approved = sentAssetRepository.save(new SentAssetDetails(agreementId, data, "APPROVED", new Date()));
+
+            SentAssetDetails approved =findSendDataFromId(request.getDataId());
+            approved.setStatus("APPROVED");
+            approved.setContractAgreementId(agreementId);
+
+            sentAssetRepository.save(approved);
             cacheService.putData(agreementId, data, approved.getId());
 
         } catch (Exception e) {
@@ -100,9 +106,28 @@ public class DataTransferController {
         }
     }
 
+
+    private SentAssetDetails findSendDataFromId(String id){
+        Optional<SentAssetDetails> sentAssetDetailOpt=sentAssetRepository.findById(id);
+        if(!sentAssetDetailOpt.isPresent()){
+            throw new RuntimeException();
+        }
+        return  sentAssetDetailOpt.get();
+    }
+
     @GetMapping(value = "/received/data/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, List<ReceivedAssetDetails>> getReceivedAssetDetails() {
         return Map.of("data", receivedAssetRepository.findAll());
+    }
+
+    @PostMapping(value = "/create/data", produces = MediaType.APPLICATION_JSON_VALUE)
+    public SentAssetDetails createSendData(@RequestBody CreateDataRequest createDataRequest) {
+        return sentAssetRepository.save(new SentAssetDetails(null,createDataRequest.getDescription(), "CREATED", new Date()));
+    }
+
+    @GetMapping(value = "/sent/data/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, List<SentAssetDetails>> getSentDataDetails() {
+        return Map.of("data", sentAssetRepository.findAll());
     }
 
     @PostMapping("/create/received/data")
