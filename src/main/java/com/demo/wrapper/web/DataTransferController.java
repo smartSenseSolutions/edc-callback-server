@@ -90,14 +90,12 @@ public class DataTransferController {
             TransferId transferId = edcService.initiateTransferProcess(agreementId, contractOffer.get().getAsset().getId(), edcConfiguration.getTransferProcessUrl(), request.getProviderIdsUrl(), header);
             logger.info("TransferProcess has been completed successfully and transferId --> {} for assetId --> {}", transferId.getId(), request.getAssetId());
 
-            String data = objectMapper.writeValueAsString(request);
-
             SentAssetDetails approved = findSendDataFromId(request.getDataId());
             approved.setStatus("APPROVED");
             approved.setContractAgreementId(agreementId);
 
             sentAssetRepository.save(approved);
-            cacheService.putData(agreementId, data, approved.getId());
+            cacheService.putData(agreementId, request.getData(), approved.getId());
 
         } catch (Exception e) {
             String key = "edcCatalogNegotiationWithTransferProcess_assetId_" + request.getAssetId();
