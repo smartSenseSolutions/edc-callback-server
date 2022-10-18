@@ -92,7 +92,7 @@ public class DataTransferController {
 
             String data = objectMapper.writeValueAsString(request);
 
-            SentAssetDetails approved =findSendDataFromId(request.getDataId());
+            SentAssetDetails approved = findSendDataFromId(request.getDataId());
             approved.setStatus("APPROVED");
             approved.setContractAgreementId(agreementId);
 
@@ -107,12 +107,12 @@ public class DataTransferController {
     }
 
 
-    private SentAssetDetails findSendDataFromId(String id){
-        Optional<SentAssetDetails> sentAssetDetailOpt=sentAssetRepository.findById(id);
-        if(!sentAssetDetailOpt.isPresent()){
+    private SentAssetDetails findSendDataFromId(String id) {
+        Optional<SentAssetDetails> sentAssetDetailOpt = sentAssetRepository.findById(id);
+        if (!sentAssetDetailOpt.isPresent()) {
             throw new RuntimeException();
         }
-        return  sentAssetDetailOpt.get();
+        return sentAssetDetailOpt.get();
     }
 
     @GetMapping(value = "/received/data/list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -122,7 +122,7 @@ public class DataTransferController {
 
     @PostMapping(value = "/create/data", produces = MediaType.APPLICATION_JSON_VALUE)
     public SentAssetDetails createSendData(@RequestBody CreateDataRequest createDataRequest) {
-        return sentAssetRepository.save(new SentAssetDetails(null,createDataRequest.getDescription(), "CREATED", new Date()));
+        return sentAssetRepository.save(new SentAssetDetails(null, createDataRequest.getDescription(), "CREATED", new Date()));
     }
 
     @GetMapping(value = "/sent/data/list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -134,6 +134,6 @@ public class DataTransferController {
     public ReceivedAssetDetails receiveData(@RequestBody TransferData response) throws JsonProcessingException {
         String data = objectMapper.writeValueAsString(response);
         logger.info("Data {} Has Received..", data);
-        return receivedAssetRepository.save(new ReceivedAssetDetails(response.getReferenceId(), response.getContractAggrementId(), data, "RECEIVED", new Date()));
+        return receivedAssetRepository.save(new ReceivedAssetDetails(response.getReferenceId(), response.getContractAggrementId(), response.getDescription(), "RECEIVED", new Date()));
     }
 }
