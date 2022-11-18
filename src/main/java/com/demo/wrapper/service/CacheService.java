@@ -28,7 +28,7 @@ public class CacheService {
         TransferData transferData = new TransferData();
         transferData.setDescription(data);
         transferData.setReferenceId(referenceId);
-        transferData.setContractAggrementId(agreementId);
+        transferData.setContractAgreementId(agreementId);
         contractAgreementAndDataMap.put(agreementId, transferData);
     }
 

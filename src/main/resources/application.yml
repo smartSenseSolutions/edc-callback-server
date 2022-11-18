@@ -32,11 +32,11 @@ spring:
     validate-on-migrate: true
 
 organization:
-  edcHost: ${EDC_HOST:http://localhost:9192}
-  catalogEndpoint: ${CATALOG_ENDPOINT:/api/v1/data/catalog?providerUrl=}
-  transferEndpoint: ${TRANSFER_ENDPOINT:/api/v1/data/transferprocess}
-  negotiationEndpoint: ${NEGOTIATION_ENDPOINT:/api/v1/data/contractnegotiations}
-  authkey: ${AUTH_KEY:password}
+  edcHost: ${EDC_HOST:https://controlplane.dev.demo.ftcpro.co}
+  catalogEndpoint: ${CATALOG_ENDPOINT:/data/catalog?providerUrl=}
+  transferEndpoint: ${TRANSFER_ENDPOINT:/data/transferprocess}
+  negotiationEndpoint: ${NEGOTIATION_ENDPOINT:/data/contractnegotiations}
+  authkey: ${AUTH_KEY:RS377diCTWtjVHuzYz7RcGDFV8wbePh}
 
 management:
   endpoint:

@@ -24,7 +24,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class DataTransferController {
@@ -132,6 +136,6 @@ public class DataTransferController {
     public ReceivedAssetDetails receiveData(@RequestBody TransferData response) throws JsonProcessingException {
         String data = objectMapper.writeValueAsString(response);
         logger.info("Data {} Has Received..", data);
-        return receivedAssetRepository.save(new ReceivedAssetDetails(response.getReferenceId(), response.getContractAggrementId(), response.getDescription(), "RECEIVED", new Date()));
+        return receivedAssetRepository.save(new ReceivedAssetDetails(response.getReferenceId(), response.getContractAgreementId(), response.getDescription(), "RECEIVED", new Date()));
     }
 }

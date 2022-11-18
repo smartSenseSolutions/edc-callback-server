@@ -7,7 +7,7 @@ public class TransferData {
 
     private String description;
     private String referenceId;
-    private String contractAggrementId;
+    private String contractAgreementId;
 
     public TransferData(String description) {
         this.description = description;
@@ -29,11 +29,11 @@ public class TransferData {
         this.referenceId = referenceId;
     }
 
-    public String getContractAggrementId() {
-        return contractAggrementId;
+    public String getContractAgreementId() {
+        return contractAgreementId;
     }
 
-    public void setContractAggrementId(String contractAggrementId) {
-        this.contractAggrementId = contractAggrementId;
+    public void setContractAgreementId(String contractAgreementId) {
+        this.contractAgreementId = contractAgreementId;
     }
 }
