@@ -1,5 +1,6 @@
 package com.demo.wrapper.web;
 
+import com.demo.wrapper.dao.SentAssetDetails;
 import com.demo.wrapper.model.EndpointDataReference;
 import com.demo.wrapper.model.TransferData;
 import com.demo.wrapper.repository.SentAssetRepository;
@@ -14,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 @RestController
 public class EdcCallbackController {
@@ -40,10 +43,7 @@ public class EdcCallbackController {
         var contractAgreementId = dataReference.getProperties().get("cid");
         logger.info("EdcCallbackController [receiveEdcCallback] callBackId :: {}\n, contractAgreementId :: {}\n, Endpoint :: {}\n, AuthKey :: {}\n, AuthCode :: {}\n",
                 dataReference.getId(), contractAgreementId, dataReference.getEndpoint(), dataReference.getAuthKey(), dataReference.getAuthCode());
-        TransferData value = new TransferData();
-        value.setDescription("This is testing data.");
-        value.setReferenceId("testData");
-        value.setContractAgreementId(contractAgreementId);
+        TransferData value = cacheService.getData(contractAgreementId);
         String body = objectMapper.writeValueAsString(value);
         Request request = new Request.Builder()
                 .url(dataReference.getEndpoint())
@@ -53,11 +53,11 @@ public class EdcCallbackController {
         try (var response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 logger.info("Transfer Process Has been completed");
-//                Optional<SentAssetDetails> data = sentAssetRepository.findById(value.getReferenceId());
-//                if (data.isPresent()) {
-//                    data.get().setStatus("SENT");
-//                    sentAssetRepository.save(data.get());
-//                }
+                Optional<SentAssetDetails> data = sentAssetRepository.findById(value.getReferenceId());
+                if (data.isPresent()) {
+                    data.get().setStatus("SENT");
+                    sentAssetRepository.save(data.get());
+                }
             } else {
                 logger.error("Transfer process has been failed.");
             }
