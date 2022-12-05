@@ -1,0 +1,11 @@
+FROM ghcr.io/graalvm/graalvm-ce:ol7-java11-21.2.0
+ADD . /build
+WORKDIR /build
+RUN yum install -y unzip zip
+RUN curl -s https://get.sdkman.io | bash
+RUN /bin/bash -c "source /root/.sdkman/bin/sdkman-init.sh; sdk version; sdk install java 22.3.r17-grl; sdk use java 22.3.r17-grl"
+RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && ./gradlew nativeCompile -i -x test -x javadoc
+
+FROM oraclelinux:7-slim
+COPY --from=0 "/build/build/native/nativeCompile/wrapper" wrapper
+CMD [ "sh", "-c", "./wrapper -Dserver.port=$PORT" ]
