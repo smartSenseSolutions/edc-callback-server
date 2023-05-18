@@ -91,7 +91,7 @@ public class DataTransferController {
             logger.info("Contract negotiation process has been completed and generated agreementId --> {}", agreementId);
 
             logger.info("TRANSFER_PROCESS :: Init process for transfer data --> ConsumerUrl ::{}, ProviderIdsUrl :: {}", edcConfiguration.getTransferProcessUrl(), request.getProviderIdsUrl());
-            TransferId transferId = edcService.initiateTransferProcess(agreementId, contractOffer.get().getAsset().getId(), edcConfiguration.getTransferProcessUrl(), request.getProviderIdsUrl(), header);
+            TransferId transferId = edcService.initiateTransferProcess(agreementId, contractOffer.get().getAssetId(), edcConfiguration.getTransferProcessUrl(), request.getProviderIdsUrl(), header);
             logger.info("TransferProcess has been completed successfully and transferId --> {} for assetId --> {}", transferId.getId(), request.getAssetId());
 
             SentAssetDetails approved = findSendDataFromId(request.getDataId());
