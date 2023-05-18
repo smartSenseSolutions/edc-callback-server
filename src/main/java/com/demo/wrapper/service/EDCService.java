@@ -59,7 +59,7 @@ public class EDCService {
         logger.info("EDCService :: initializeContractNegotiation --> offerId :{}, assetId:{}", contractOffer.get().getId(), contractOffer.get().getAssetId());
         var negotiationId = initiateNegotiation(negotiationRequest, contractNegotiationUrl, header);
         ContractNegotiationDto negotiation = null;
-        while (negotiation == null || !negotiation.getState().equals("CONFIRMED")) {
+        while (negotiation == null || !negotiation.getState().equals("FINALIZED")) {
             logger.info("EDCService :: initializeContractNegotiation --> waiting for contract to get confirmed");
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             ScheduledFuture<ContractNegotiationDto> scheduledFuture =
