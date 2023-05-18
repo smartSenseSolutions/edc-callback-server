@@ -52,11 +52,11 @@ public class EDCService {
     }
 
     public String initializeContractNegotiation(String contractNegotiationUrl, String providerConnectorUrl, Optional<ContractOffer> contractOffer, Map<String, String> header) throws InterruptedException, IOException {
-        var contractOfferDescription = new ContractOfferDescription(contractOffer.get().getId(), contractOffer.get().getAsset().getId(), null, contractOffer.get().getPolicy());
+        var contractOfferDescription = new ContractOfferDescription(contractOffer.get().getId(), contractOffer.get().getAssetId(), null, contractOffer.get().getPolicy());
         var negotiationRequest = NegotiationInitiateRequestDto.Builder.newInstance()
                 .offerId(contractOfferDescription).connectorId("provider").connectorAddress(providerConnectorUrl)
                 .protocol("ids-multipart").build();
-        logger.info("EDCService :: initializeContractNegotiation --> offerId :{}, assetId:{}", contractOffer.get().getId(), contractOffer.get().getAsset().getId());
+        logger.info("EDCService :: initializeContractNegotiation --> offerId :{}, assetId:{}", contractOffer.get().getId(), contractOffer.get().getAssetId());
         var negotiationId = initiateNegotiation(negotiationRequest, contractNegotiationUrl, header);
         ContractNegotiationDto negotiation = null;
         while (negotiation == null || !negotiation.getState().equals("CONFIRMED")) {
