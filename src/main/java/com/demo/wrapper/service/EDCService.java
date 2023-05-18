@@ -47,7 +47,7 @@ public class EDCService {
         }
         logger.info("EDCService :: fetchCatalogs --> Fetched Contract Count :: {}", catalog.getContractOffers().size());
         return catalog.getContractOffers().stream()
-                .filter(it -> it.getAsset().getProperty(ASSET_TYPE_PROPERTY_NAME) != null && it.getAsset().getProperty(ASSET_TYPE_PROPERTY_NAME).equals(assetId))
+                .filter(it -> it.getAssetId().equals(assetId))
                 .findFirst();
     }
 
