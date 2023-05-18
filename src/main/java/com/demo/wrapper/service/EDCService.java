@@ -26,7 +26,7 @@ import java.util.concurrent.*;
 public class EDCService {
 
     private static final Logger logger = LoggerFactory.getLogger(EDCService.class);
-    public static final String ASSET_TYPE_PROPERTY_NAME = "asset:prop:id";
+    public static final String ASSET_TYPE_PROPERTY_NAME = "assetId";
     public static final MediaType JSON = MediaType.get("application/json");
     private final HttpCallService httpCallService;
 
