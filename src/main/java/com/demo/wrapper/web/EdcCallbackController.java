@@ -1,75 +1,73 @@
 package com.demo.wrapper.web;
 
-import com.demo.wrapper.dao.SentAssetDetails;
 import com.demo.wrapper.model.EndpointDataReference;
-import com.demo.wrapper.model.TransferData;
-import com.demo.wrapper.repository.SentAssetRepository;
-import com.demo.wrapper.service.CacheService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.MediaType;
+import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 public class EdcCallbackController {
 
     private static final Logger logger = LoggerFactory.getLogger(EdcCallbackController.class);
 
     private final OkHttpClient client;
 
-    private final CacheService cacheService;
-
     private final ObjectMapper objectMapper;
+    private final Map<String, Object> callBackMap = new HashMap<>();
 
-    private final SentAssetRepository sentAssetRepository;
 
-    public EdcCallbackController(OkHttpClient client, CacheService cacheService, ObjectMapper objectMapper, SentAssetRepository sentAssetRepository) {
-        this.client = client;
-        this.cacheService = cacheService;
-        this.objectMapper = objectMapper;
-        this.sentAssetRepository = sentAssetRepository;
-    }
+    @PostMapping(value = "/standalone-callback")
+    public void edcCallbackReceiver(@RequestBody EndpointDataReference dataReference) {
+        var transferId = dataReference.getId();
 
-    @PostMapping(value = "/endpoint-data-reference")
-    public void receiveEdcCallback(@RequestBody EndpointDataReference dataReference) throws JsonProcessingException {
-        var contractAgreementId = dataReference.getProperties().get("cid");
-        logger.info("EdcCallbackController [receiveEdcCallback] callBackId :: {}\n, contractAgreementId :: {}\n, Endpoint :: {}\n, AuthKey :: {}\n, AuthCode :: {}\n",
-                dataReference.getId(), contractAgreementId, dataReference.getEndpoint(), dataReference.getAuthKey(), dataReference.getAuthCode());
-        TransferData value = cacheService.getData(contractAgreementId);
-        String body = objectMapper.writeValueAsString(value);
         Request request = new Request.Builder()
                 .url(dataReference.getEndpoint())
                 .addHeader(dataReference.getAuthKey(), dataReference.getAuthCode())
-                .post(okhttp3.RequestBody.create(body, MediaType.get("application/json")))
+                .get()
                 .build();
+
+        if(callBackMap.containsKey(transferId)){
+            return;
+        }
+
         try (var response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 logger.info("Transfer Process Has been completed");
-                Optional<SentAssetDetails> data = sentAssetRepository.findById(value.getReferenceId());
-                if (data.isPresent()) {
-                    data.get().setStatus("SENT");
-                    sentAssetRepository.save(data.get());
-                }
+                callBackMap.put(transferId, objectMapper.readValue(response.body().string(), Map.class));
             } else {
-                logger.error("Transfer process has been failed.");
+                logger.error("Transfer process failed with status {} and response body {}", response.code(), response.body().string());
             }
         } catch (Exception e) {
-            String key = "receiveEcCallback_agreementId_" + contractAgreementId;
-            CacheService.socketException.put(key, CacheService.socketException.containsKey(key) ? CacheService.socketException.get(key) + 1 : 1);
-            throw new RuntimeException(e);
+            logger.error("Error while fetching data for transfer id: {}", transferId, e);
         }
     }
 
-    @PostMapping(value = "/test")
-    public void test(@RequestBody String data) {
-        logger.info("Data {} Has Received..", data);
+    @GetMapping(value = "/standalone-callback/{transferProcessId}")
+    public ResponseEntity<Map<String, Object>> getEdcCallback(@PathVariable("transferProcessId") String transferProcessId) {
+        if (!callBackMap.containsKey(transferProcessId)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(Map.of(transferProcessId, callBackMap.getOrDefault(transferProcessId, null)));
+    }
+
+    @DeleteMapping(value = "/standalone-callback/{transferProcessId}")
+    public ResponseEntity<Object> removeEdcCallback(@PathVariable("transferProcessId") String transferProcessId) {
+        if (!callBackMap.containsKey(transferProcessId)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        callBackMap.remove(transferProcessId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,9 +1,9 @@
-FROM gradle:7.5-jdk17-alpine AS build
+FROM gradle:7.6.4-jdk17-alpine AS build
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle build --no-daemon -i -x test -x javadoc
 
-FROM openjdk:17-alpine
+FROM eclipse-temurin:17-jre-alpine
 RUN mkdir /home/app
 COPY --from=build /home/gradle/src/build/libs/wrapper-0.0.1-SNAPSHOT.jar /home/app
 WORKDIR /home/app
