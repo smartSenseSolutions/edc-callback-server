@@ -25,6 +25,16 @@ public class EdcCallbackController {
     private final ObjectMapper objectMapper;
     private final Map<String, Object> callBackMap = new HashMap<>();
 
+    @GetMapping(value = "/sub-model")
+    public ResponseEntity<Map<String, Object>> getSubModelData() {
+        return ResponseEntity.ok(Map.of(
+                        "userId", 1,
+                        "id", 1,
+                        "title", "delectus aut autem",
+                        "completed", false
+                )
+        );
+    }
 
     @PostMapping(value = "/standalone-callback")
     public void edcCallbackReceiver(@RequestBody EndpointDataReference dataReference) {
@@ -36,7 +46,7 @@ public class EdcCallbackController {
                 .get()
                 .build();
 
-        if(callBackMap.containsKey(transferId)){
+        if (callBackMap.containsKey(transferId)) {
             return;
         }
 
